@@ -14,6 +14,38 @@
   margin-top: 8px;
 }
 
+.preset-picker {
+  margin-bottom: 32px;
+}
+
+.preset-heading {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.preset-btn {
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.preset-btn:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
 .entry-form {
   display: flex;
   flex-direction: column;

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { WorkoutEntry } from './types'
 import { useLocalStorage } from './useLocalStorage'
+import { workoutPresets } from './presets'
 import './App.css'
 
 function App() {
@@ -42,6 +43,24 @@ function App() {
     setEntries((prev) => prev.filter((e) => e.id !== id))
   }
 
+  function loadPreset(presetName: string) {
+    const preset = workoutPresets.find((p) => p.name === presetName)
+    if (!preset) return
+
+    const now = Date.now()
+    const newEntries: WorkoutEntry[] = preset.exercises.map((ex, i) => ({
+      id: crypto.randomUUID(),
+      exercise: ex.exercise,
+      sets: ex.sets,
+      reps: ex.reps,
+      weight: ex.weight,
+      done: false,
+      createdAt: now + i,
+    }))
+
+    setEntries((prev) => [...newEntries, ...prev])
+  }
+
   return (
     <div className="app">
       <header className="header">
@@ -52,6 +71,22 @@ function App() {
             : `${completedCount} of ${entries.length} exercises completed today`}
         </p>
       </header>
+
+      <div className="preset-picker">
+        <h2 className="preset-heading">Load workout</h2>
+        <div className="preset-buttons">
+          {workoutPresets.map((preset) => (
+            <button
+              key={preset.name}
+              type="button"
+              className="preset-btn"
+              onClick={() => loadPreset(preset.name)}
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <form className="entry-form" onSubmit={addEntry}>
         <input

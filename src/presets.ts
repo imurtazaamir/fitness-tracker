@@ -1,0 +1,99 @@
+export interface PresetExercise {
+  exercise: string
+  sets: number
+  reps: number
+  weight: number
+}
+
+export interface WorkoutPreset {
+  name: string
+  exercises: PresetExercise[]
+}
+
+export const workoutPresets: WorkoutPreset[] = [
+  {
+    name: 'Back',
+    exercises: [
+      { exercise: 'T Bar Row / Leverage Row', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Hoist Row / Db Row', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Neutral Pull Down', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Leverage Upper Back', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Straight Bar Pullover', sets: 2, reps: 16, weight: 0 },
+      { exercise: 'Shrugs (Smith Machine)', sets: 2, reps: 15, weight: 0 },
+    ],
+  },
+  {
+    name: 'Chest & Delts',
+    exercises: [
+      { exercise: 'Incline Chest Press', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Leverage Press', sets: 2, reps: 14, weight: 20 },
+      { exercise: 'Incline Chest Fly', sets: 2, reps: 15, weight: 10 },
+      { exercise: 'Neutral Grip Chest Press', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Delt Press', sets: 2, reps: 12, weight: 10 },
+      { exercise: 'Lateral Raises', sets: 2, reps: 15, weight: 6 },
+      { exercise: 'Rear Delt', sets: 2, reps: 15, weight: 0 },
+    ],
+  },
+  {
+    name: 'Legs',
+    exercises: [
+      { exercise: 'Leg Extensions', sets: 2, reps: 15, weight: 100 },
+      { exercise: 'Swing Squat', sets: 2, reps: 12, weight: 20 },
+      { exercise: 'Leg Press Precor', sets: 2, reps: 15, weight: 40 },
+      { exercise: 'Lying Ham Curl Nautilus', sets: 2, reps: 15, weight: 90 },
+      { exercise: 'Seated Ham Curl', sets: 2, reps: 15, weight: 50 },
+      { exercise: 'Glute Kickback', sets: 1, reps: 12, weight: 0 },
+      { exercise: 'Abs Crunch', sets: 1, reps: 15, weight: 43 },
+      { exercise: 'Seated Calf', sets: 2, reps: 12, weight: 0 },
+    ],
+  },
+  {
+    name: 'Delts, Arms & Calves',
+    exercises: [
+      { exercise: 'Neutral Grip Shoulder Press', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Lateral Raises', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Seated Calf', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Reverse Fly', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Preacher Curl Machine', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Tricep Extension Rope', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Incline Bicep Curls Dbs', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Overhead Tricep Ext', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Warm Up: Rope Face Pulls', sets: 2, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Push Ups (Neutral Grip)', sets: 1, reps: 10, weight: 0 },
+    ],
+  },
+  {
+    name: 'Quads & Back',
+    exercises: [
+      { exercise: 'Single Leg Lunges (Front Foot Elevated)', sets: 3, reps: 12, weight: 8 },
+      { exercise: 'T Bar Row', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Leg Press', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Neutral Lat Pull Down', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Leg Extensions', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Upper Back Row', sets: 3, reps: 12, weight: 0 },
+      { exercise: 'Abs Crunch Machine', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Warm Up: Lying Hamstring Curl', sets: 1, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Leg Extensions', sets: 1, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Adduction Machine', sets: 1, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Rope Face Pulls', sets: 1, reps: 10, weight: 0 },
+    ],
+  },
+  {
+    name: 'Hamstrings, Glutes & Push',
+    exercises: [
+      { exercise: 'Lying Hamstring Curl', sets: 2, reps: 15, weight: 60 },
+      { exercise: 'Pec Fly', sets: 2, reps: 15, weight: 0 },
+      { exercise: 'Seated Hamstring Curl', sets: 2, reps: 12, weight: 54 },
+      { exercise: 'Bench Barbell', sets: 3, reps: 6, weight: 60 },
+      { exercise: 'Reverse Lunges', sets: 3, reps: 15, weight: 0 },
+      { exercise: 'Horizontal Chest Press', sets: 3, reps: 18, weight: 40 },
+      { exercise: 'Abduction', sets: 2, reps: 15, weight: 0 },
+      { exercise: 'Cable Fly', sets: 2, reps: 15, weight: 5 },
+      { exercise: 'Abs Machine Crunch', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Decline Bench Sit Ups', sets: 2, reps: 12, weight: 0 },
+      { exercise: 'Warm Up: Lying Hamstring Curl', sets: 1, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Adduction Machine', sets: 1, reps: 10, weight: 0 },
+      { exercise: 'Warm Up: Rope Face Pulls', sets: 1, reps: 10, weight: 0 },
+    ],
+  },
+]
