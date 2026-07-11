@@ -45,7 +45,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Fitness Tracker</h1>
+        <h1>Beast App</h1>
         <p className="subtitle">
           {entries.length === 0
             ? 'Log your first workout below'
