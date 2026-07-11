@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import type { WorkoutEntry } from './types'
+import type { ExerciseHistory, WorkoutEntry } from './types'
 import { useLocalStorage } from './useLocalStorage'
 import { workoutPresets } from './presets'
 import { WeightTracker } from './WeightTracker'
+import { todayKey } from './date'
 import './App.css'
 
 function App() {
   const [entries, setEntries] = useLocalStorage<WorkoutEntry[]>('fitness-tracker:entries', [])
+  const [history, setHistory] = useLocalStorage<ExerciseHistory>('fitness-tracker:exercise-history', {})
   const [activeDay, setActiveDay] = useState<string | null>(null)
   const [exercise, setExercise] = useState('')
   const [sets, setSets] = useState(3)
@@ -52,6 +54,37 @@ function App() {
 
   function removeEntry(id: string) {
     setEntries((prev) => prev.filter((e) => e.id !== id))
+  }
+
+  function updateSetWeight(entryId: string, setIndex: number, value: number) {
+    const entry = entries.find((e) => e.id === entryId)
+    if (!entry) return
+
+    const setWeights = [...(entry.setWeights ?? Array(entry.sets).fill(0))]
+    setWeights[setIndex] = value
+
+    setEntries((prev) => prev.map((e) => (e.id === entryId ? { ...e, setWeights } : e)))
+
+    const today = todayKey()
+    setHistory((prev) => {
+      const records = prev[entry.exercise] ?? []
+      const existingIndex = records.findIndex((r) => r.date === today)
+      const nextRecords =
+        existingIndex >= 0
+          ? records.map((r, i) => (i === existingIndex ? { date: today, weights: setWeights } : r))
+          : [...records, { date: today, weights: setWeights }]
+      return { ...prev, [entry.exercise]: nextRecords }
+    })
+  }
+
+  function lastSession(exerciseName: string) {
+    const records = history[exerciseName]
+    if (!records || records.length === 0) return null
+    const today = todayKey()
+    const prior = records
+      .filter((r) => r.date !== today)
+      .sort((a, b) => b.date.localeCompare(a.date))
+    return prior[0] ?? null
   }
 
   function selectDay(dayName: string | null) {
@@ -143,7 +176,7 @@ function App() {
             />
           </label>
           <label>
-            Weight (lb)
+            Weight (kg)
             <input
               type="number"
               min={0}
@@ -156,29 +189,56 @@ function App() {
       </form>
 
       <ul className="entry-list">
-        {visibleEntries.map((entry) => (
-          <li key={entry.id} className={entry.done ? 'entry done' : 'entry'}>
-            <label className="entry-check">
-              <input
-                type="checkbox"
-                checked={entry.done}
-                onChange={() => toggleDone(entry.id)}
-              />
-              <span className="entry-name">{entry.exercise}</span>
-            </label>
-            <span className="entry-meta">
-              {entry.sets} × {entry.reps}{entry.weight > 0 ? ` @ ${entry.weight}lb` : ''}
-            </span>
-            <button
-              type="button"
-              className="remove-btn"
-              onClick={() => removeEntry(entry.id)}
-              aria-label={`Remove ${entry.exercise}`}
-            >
-              ×
-            </button>
-          </li>
-        ))}
+        {visibleEntries.map((entry) => {
+          const last = lastSession(entry.exercise)
+          return (
+            <li key={entry.id} className={entry.done ? 'entry done' : 'entry'}>
+              <div className="entry-top">
+                <label className="entry-check">
+                  <input
+                    type="checkbox"
+                    checked={entry.done}
+                    onChange={() => toggleDone(entry.id)}
+                  />
+                  <span className="entry-name">{entry.exercise}</span>
+                </label>
+                <span className="entry-meta">
+                  {entry.sets} × {entry.reps}
+                </span>
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={() => removeEntry(entry.id)}
+                  aria-label={`Remove ${entry.exercise}`}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="entry-sets">
+                {Array.from({ length: entry.sets }).map((_, i) => (
+                  <label key={i} className="set-input">
+                    <span>Set {i + 1}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      placeholder={last?.weights[i] ? `${last.weights[i]}` : '0'}
+                      value={entry.setWeights?.[i] || ''}
+                      onChange={(e) => updateSetWeight(entry.id, i, Number(e.target.value))}
+                    />
+                  </label>
+                ))}
+              </div>
+
+              {last && (
+                <p className="entry-last">
+                  Last time: {last.weights.map((w) => `${w}kg`).join(' / ')}
+                </p>
+              )}
+            </li>
+          )
+        })}
       </ul>
     </div>
   )

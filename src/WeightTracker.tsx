@@ -2,25 +2,13 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { WeightEntry } from './types'
 import { useLocalStorage } from './useLocalStorage'
+import { todayKey, formatShortDate } from './date'
 
 const CHART_WIDTH = 480
 const CHART_HEIGHT = 140
 const PAD_X = 12
 const PAD_TOP = 16
 const PAD_BOTTOM = 24
-
-function todayKey() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
-function formatShortDate(dateKey: string) {
-  const [y, m, d] = dateKey.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-}
 
 export function WeightTracker() {
   const [entries, setEntries] = useLocalStorage<WeightEntry[]>('fitness-tracker:weight-log', [])
@@ -90,7 +78,7 @@ export function WeightTracker() {
           type="number"
           min={0}
           step="0.1"
-          placeholder="Weight (lb)"
+          placeholder="Weight (kg)"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
@@ -102,10 +90,10 @@ export function WeightTracker() {
       ) : (
         <>
           <div className="weight-summary">
-            <span className="weight-latest">{latest.weight} lb</span>
+            <span className="weight-latest">{latest.weight} kg</span>
             {delta !== null && (
               <span className="weight-delta">
-                {delta > 0 ? '▲' : delta < 0 ? '▼' : '—'} {Math.abs(delta).toFixed(1)} lb since last log
+                {delta > 0 ? '▲' : delta < 0 ? '▼' : '—'} {Math.abs(delta).toFixed(1)} kg since last log
               </span>
             )}
           </div>
@@ -152,7 +140,7 @@ export function WeightTracker() {
 
           {hoverIndex !== null && (
             <div className="weight-tooltip">
-              {formatShortDate(points[hoverIndex].entry.date)}: {points[hoverIndex].entry.weight} lb
+              {formatShortDate(points[hoverIndex].entry.date)}: {points[hoverIndex].entry.weight} kg
             </div>
           )}
 
@@ -168,7 +156,7 @@ export function WeightTracker() {
               .map((entry) => (
                 <li key={entry.date}>
                   <span>{formatShortDate(entry.date)}</span>
-                  <span>{entry.weight} lb</span>
+                  <span>{entry.weight} kg</span>
                   <button
                     type="button"
                     onClick={() => removeEntry(entry.date)}

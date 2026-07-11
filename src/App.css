@@ -274,8 +274,8 @@
 
 .entry {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -284,6 +284,12 @@
 .entry.done .entry-name {
   text-decoration: line-through;
   color: var(--text);
+}
+
+.entry-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .entry-check {
@@ -317,4 +323,35 @@
 
 .remove-btn:hover {
   color: var(--accent);
+}
+
+.entry-sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.set-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.set-input input {
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  width: 70px;
+  box-sizing: border-box;
+}
+
+.entry-last {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text);
 }
