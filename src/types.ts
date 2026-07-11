@@ -6,4 +6,10 @@ export interface WorkoutEntry {
   weight: number;
   done: boolean;
   createdAt: number;
+  day?: string;
+}
+
+export interface WeightEntry {
+  date: string;
+  weight: number;
 }

@@ -3,16 +3,26 @@ import type { FormEvent } from 'react'
 import type { WorkoutEntry } from './types'
 import { useLocalStorage } from './useLocalStorage'
 import { workoutPresets } from './presets'
+import { WeightTracker } from './WeightTracker'
 import './App.css'
 
 function App() {
   const [entries, setEntries] = useLocalStorage<WorkoutEntry[]>('fitness-tracker:entries', [])
+  const [activeDay, setActiveDay] = useState<string | null>(null)
   const [exercise, setExercise] = useState('')
   const [sets, setSets] = useState(3)
   const [reps, setReps] = useState(10)
   const [weight, setWeight] = useState(0)
 
-  const completedCount = useMemo(() => entries.filter((e) => e.done).length, [entries])
+  const visibleEntries = useMemo(
+    () => (activeDay ? entries.filter((e) => e.day === activeDay) : entries),
+    [entries, activeDay],
+  )
+
+  const completedCount = useMemo(
+    () => visibleEntries.filter((e) => e.done).length,
+    [visibleEntries],
+  )
 
   function addEntry(e: FormEvent) {
     e.preventDefault()
@@ -26,6 +36,7 @@ function App() {
       weight,
       done: false,
       createdAt: Date.now(),
+      day: activeDay ?? undefined,
     }
 
     setEntries((prev) => [entry, ...prev])
@@ -43,9 +54,15 @@ function App() {
     setEntries((prev) => prev.filter((e) => e.id !== id))
   }
 
-  function loadPreset(presetName: string) {
-    const preset = workoutPresets.find((p) => p.name === presetName)
+  function selectDay(dayName: string | null) {
+    setActiveDay(dayName)
+    if (!dayName) return
+
+    const preset = workoutPresets.find((p) => p.name === dayName)
     if (!preset) return
+
+    const alreadyLoaded = entries.some((e) => e.day === dayName)
+    if (alreadyLoaded) return
 
     const now = Date.now()
     const newEntries: WorkoutEntry[] = preset.exercises.map((ex, i) => ({
@@ -56,6 +73,7 @@ function App() {
       weight: ex.weight,
       done: false,
       createdAt: now + i,
+      day: dayName,
     }))
 
     setEntries((prev) => [...newEntries, ...prev])
@@ -66,21 +84,30 @@ function App() {
       <header className="header">
         <h1>Beast App</h1>
         <p className="subtitle">
-          {entries.length === 0
+          {visibleEntries.length === 0
             ? 'Log your first workout below'
-            : `${completedCount} of ${entries.length} exercises completed today`}
+            : `${completedCount} of ${visibleEntries.length} exercises completed today`}
         </p>
       </header>
 
+      <WeightTracker />
+
       <div className="preset-picker">
-        <h2 className="preset-heading">Load workout</h2>
+        <h2 className="preset-heading">Workout day</h2>
         <div className="preset-buttons">
+          <button
+            type="button"
+            className={activeDay === null ? 'preset-btn active' : 'preset-btn'}
+            onClick={() => selectDay(null)}
+          >
+            All
+          </button>
           {workoutPresets.map((preset) => (
             <button
               key={preset.name}
               type="button"
-              className="preset-btn"
-              onClick={() => loadPreset(preset.name)}
+              className={activeDay === preset.name ? 'preset-btn active' : 'preset-btn'}
+              onClick={() => selectDay(preset.name)}
             >
               {preset.name}
             </button>
@@ -129,7 +156,7 @@ function App() {
       </form>
 
       <ul className="entry-list">
-        {entries.map((entry) => (
+        {visibleEntries.map((entry) => (
           <li key={entry.id} className={entry.done ? 'entry done' : 'entry'}>
             <label className="entry-check">
               <input
