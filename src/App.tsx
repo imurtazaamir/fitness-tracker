@@ -4,13 +4,16 @@ import type { ExerciseHistory, WorkoutEntry } from './types'
 import { useLocalStorage } from './useLocalStorage'
 import { workoutPresets } from './presets'
 import { WeightTracker } from './WeightTracker'
+import { AnalyticsPage } from './AnalyticsPage'
 import { todayKey } from './date'
+import { recordCompletion, removeCompletion } from './db'
 import './App.css'
 
 function App() {
   const [entries, setEntries] = useLocalStorage<WorkoutEntry[]>('fitness-tracker:entries', [])
   const [history, setHistory] = useLocalStorage<ExerciseHistory>('fitness-tracker:exercise-history', {})
   const [activeDay, setActiveDay] = useState<string | null>(null)
+  const [view, setView] = useState<'workout' | 'analytics'>('workout')
   const [exercise, setExercise] = useState('')
   const [sets, setSets] = useState(3)
   const [reps, setReps] = useState(10)
@@ -49,7 +52,28 @@ function App() {
   }
 
   function toggleDone(id: string) {
-    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, done: !e.done } : e)))
+    const entry = entries.find((e) => e.id === id)
+    if (!entry) return
+
+    const nextDone = !entry.done
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, done: nextDone } : e)))
+
+    const completionId = `${id}_${todayKey()}`
+    if (nextDone) {
+      recordCompletion({
+        id: completionId,
+        entryId: id,
+        date: todayKey(),
+        exercise: entry.exercise,
+        day: entry.day,
+        sets: entry.sets,
+        reps: entry.reps,
+        setWeights: entry.setWeights,
+        completedAt: Date.now(),
+      })
+    } else {
+      removeCompletion(completionId)
+    }
   }
 
   function removeEntry(id: string) {
@@ -117,12 +141,35 @@ function App() {
       <header className="header">
         <h1>Beast App</h1>
         <p className="subtitle">
-          {visibleEntries.length === 0
-            ? 'Log your first workout below'
-            : `${completedCount} of ${visibleEntries.length} exercises completed today`}
+          {view === 'analytics'
+            ? 'Your training over the last 7 days'
+            : visibleEntries.length === 0
+              ? 'Log your first workout below'
+              : `${completedCount} of ${visibleEntries.length} exercises completed today`}
         </p>
       </header>
 
+      <div className="nav-tabs">
+        <button
+          type="button"
+          className={view === 'workout' ? 'nav-tab active' : 'nav-tab'}
+          onClick={() => setView('workout')}
+        >
+          Workout
+        </button>
+        <button
+          type="button"
+          className={view === 'analytics' ? 'nav-tab active' : 'nav-tab'}
+          onClick={() => setView('analytics')}
+        >
+          Analytics
+        </button>
+      </div>
+
+      {view === 'analytics' ? (
+        <AnalyticsPage />
+      ) : (
+        <>
       <WeightTracker />
 
       <div className="preset-picker">
@@ -240,6 +287,8 @@ function App() {
           )
         })}
       </ul>
+        </>
+      )}
     </div>
   )
 }
